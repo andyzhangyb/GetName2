@@ -173,6 +173,7 @@ namespace GetName2
             System.Object oooo = new object();
             System.Object bbbb = new object();
             int currentIndex = 0;
+            int completeThreadCount = 0;
             for (int i = 0; i < Environment.ProcessorCount; i++)
             {
                 ThreadPool.QueueUserWorkItem(new WaitCallback((obj) =>
@@ -181,7 +182,11 @@ namespace GetName2
                     string name = "";
                     lock (oooo)
                     {
-                        if (currentIndex >= words.Count) return;
+                        if (currentIndex >= words.Count)
+                        {
+                            ++completeThreadCount;
+                            return;
+                        }
                         name = name + words[currentIndex++].SimpleChar;
 
                         Console.WriteLine(string.Format("------------------ {0} ------------------", currentIndex));
@@ -211,7 +216,7 @@ namespace GetName2
             while (true)
             {
                 Thread.Sleep(1000);
-                if (currentIndex >= words.Count)
+                if (completeThreadCount == Environment.ProcessorCount)
                 {
                     if (File.Exists("1.txt"))
                     {
